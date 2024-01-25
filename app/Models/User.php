@@ -2,44 +2,34 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Asciisd\Zoho\ZohoManager;
+use Asciisd\Zoho\Traits\Zohoable;
+use Asciisd\Zoho\Models\Zohoable as ZohoableModel;
+use Asciisd\Zoho\Contracts\Repositories\ZohoableRepository;
 
-class User extends Authenticatable
+class User extends ZohoableModel implements ZohoableRepository
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use Zohoable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected string $zoho_module_name = 'Contacts';
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $fillable = ['first_name', 'last_name', 'email', 'phone', 'zoho_id'];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
+    public function zohoMandatoryFields(): array
+    {
+        return [
+            'First_Name' => $this->first_name,
+            'Last_Name'  => $this->last_name,
+            'Email'      => $this->email,
+            'Phone'      => $this->phone,
+        ];
+    }
+
+    public function searchCriteria()
+    {
+        ZohoManager::make($this->zoho_module_name)
+                   ->where('First_Name', $this->first_name)
+                   ->andWhere('Last_Name', $this->last_name)
+                   ->getCriteria();
+    }
 }

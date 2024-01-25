@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ZohoController;
 use App\Method\Invoice;
 use Illuminate\Support\Facades\Route;
 use Asciisd\Zoho\ZohoManager;
@@ -20,25 +21,13 @@ use com\zoho\crm\api\record\Record;
 Route::view('/', 'welcome');
 Route::get('/get-test', function () {
 
-    $leads = ZohoManager::useModule();
-    // dd($leads);
-
-    // $response = ZohoManager::make('Leads');
-    // return $modules  = $response->getAllModules();
-
-    // $record = new Record();
-    $response = $leads->create([
-        'First_Name' => 'Amr',
-        'Last_Name' => 'Emad',
-        'Email' => 'test@asciisd.com',
-        'Phone' => '012345678910',
-    ]);
-    // dd($response);
+ 
 });
 
-Route::get('/zoho/oauth2callback', function () {
-    return 1;
-});
+// Route::get('/zoho/oauth2callback', function () {
+//     return 1;
+// });
+Route::get('zoho/oauth2callback', [ZohoController::class, 'oauth2callback']);
 
 
 Route::view('dashboard', 'dashboard')
